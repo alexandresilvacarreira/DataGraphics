@@ -1,0 +1,33 @@
+<div class="row grid" isotope-container>
+	<div class="col-sm-4 col-md-4 grid-item" ng-repeat="graph in main.graphs">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4><a ng-href="{{ graph.partialSrc }}">{{ graph.heading }}</a></h4>
+			</div>
+			<!-- <div class="panel-body" style="background: url(/img/city-population-density.png) no-repeat; background-size: contain; background-position: center;"> -->
+			<div class="panel-body" style="background: url({{ graph.imageSrc }}) no-repeat; background-size: contain; background-position: center;">
+				<div class="caption">
+				</div>
+			</div>
+			<div class="panel-footer">
+				<p>Panel footer</p>
+			</div>
+		</div>
+	</div>
+
+<!-- 	<div class="col-sm-3 col-md-3 grid-item">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4>Graph</h4>
+			</div>
+			<div class="panel-body">
+				<div class="caption">
+					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corrupti, illum voluptates consectetur consequatur ducimus. Necessitatibus, nobis consequatur hic eaque.</p>
+				</div>
+			</div>
+			<div class="panel-footer">
+				<p>Panel footer</p>
+			</div>
+		</div>
+	</div> -->
+</div>

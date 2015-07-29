@@ -1,0 +1,102 @@
+<h3 class="text-center">Generic Bar Chart</h3>
+<br>
+<div class="row">
+	<div class="col-xs-8 col-xs-offset-2 col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
+		<section></section>
+	</div>
+</div>
+
+<script type="text/javascript">
+	// var chartData = [170, 50, 40, 30, 60, 50, 85, 80, 120, 120, 160, 150, 150, 90];
+	var chartData = [];
+
+	(function() {
+		for (var i = 0; i < 20; i++) {
+			chartData[i] = Math.floor(Math.random()*1000);
+		};
+	})()
+
+	var margin = {top: 30, right: 10, bottom: 30, left: 50};
+
+	var outerWidth = 720;
+	var outerHeight = 400;
+	var innerWidth 	= outerWidth - margin.left - margin.right;
+	var innerHeight	= outerHeight - margin.top - margin.bottom;
+	
+	var color;
+
+	var xScale = d3.scale.ordinal()
+						 .domain(d3.range(0, chartData.length))
+						 .rangeBands([0, innerWidth]);
+
+	var yScale = d3.scale.linear()
+						 .domain([0, d3.max(chartData)])
+						 .range([0, innerHeight]);
+
+	var svg = d3.select("section")
+					.append("svg")
+					.attr("width", outerWidth)
+					.attr("height", outerHeight);
+
+	var g = svg.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var rects 	= g.selectAll("rect").data(chartData);
+	var rect 	= rects.enter().append("rect");
+	rect.attr("width", xScale.rangeBand() - 2)
+		.attr("x", function (d, i) {
+			return xScale(i)
+		})
+		.attr("height", 0)
+		.attr("y", innerHeight)
+		.attr("fill", "#DBD053")
+		.on("mouseover", function (d) {
+			color = this.style.fill;
+			d3.select(this)
+				.style("fill", "purple")
+		})
+		.on("mouseout", function (d) {
+			d3.select(this)
+				.style("fill", color)
+		})
+		.transition()
+		.duration(3000)
+		.attr("height", function (d) {
+			return yScale(d);
+		})
+		.attr("y", function (d) {
+			return innerHeight - yScale(d);
+		})
+		.delay(function (d, i) {
+			return i * 50;
+		})
+		.ease("elastic");
+
+	// >>>>>>>>>> START OF VERTICAL TICKS >>>>>>>>>>
+	var verticalScale = d3.scale.linear()
+									.domain([0, d3.max(chartData)])
+									.range([innerHeight, 0]);
+
+	var vAxis = d3.svg.axis()
+					.scale(verticalScale)
+					.orient('left')
+					.ticks(10);
+
+	svg.append("g")
+		.attr("class", "axis")
+		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+		.call(vAxis);
+	// <<<<<<<<<< END OF VERTICAL TICKS <<<<<<<<<<
+
+	// >>>>>>>>>> START OF HORIZONTAL TICKS >>>>>>>>>>	
+	var hAxis = d3.svg.axis()
+					.scale(xScale)
+					.orient('bottom')
+					.ticks(chartData.size);
+
+	svg.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(" + margin.left + "," + (margin.top + innerHeight) + ")")
+		.call(hAxis);
+	// <<<<<<<<<< END OF HORIZONTAL TICKS <<<<<<<<<<
+</script>

@@ -1,0 +1,58 @@
+<h3 class="text-center">Population Density Around the World</h3>
+<br>
+<section></section>
+
+
+<script type="text/javascript">
+	var margin 			= {top: 0, right: -50, bottom: 0, left: -50},
+		outerWidth		= 900,
+		outerHeight 	= 450,
+		innerWidth		= outerWidth - margin.left - margin.right,
+		innerHeight		= outerHeight - margin.top - margin.bottom,
+		xColumn			= "longitude",
+		yColumn			= "latitude",
+		rColumn			= "population",
+		peopleperPixel	= 100000;
+
+	var svg = d3.select("section")
+					.append("svg")
+					.attr("width", outerWidth)
+					.attr("height", outerHeight);
+
+	var g = svg.append("g")
+					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var xScale = d3.scale.linear().range([0, innerWidth]);
+	var yScale = d3.scale.linear().range([innerHeight, 0]);
+	var rScale = d3.scale.sqrt();
+
+	function render(data) {
+		xScale.domain(d3.extent(data, function (d) { return d[xColumn] }));
+		yScale.domain(d3.extent(data, function (d) { return d[yColumn] }));
+		rScale.domain([0, d3.max(data, function (d) { return d[rColumn] })]);
+
+		var peopleMax	= rScale.domain()[1],
+			rMin		= 0,
+			rMax		= Math.sqrt(peopleMax / (peopleperPixel * Math.PI));
+		rScale.range([rMin, rMax]);
+
+		var circles = g.selectAll("circle").data(data);
+		circles.enter().append("circle");
+
+		circles.attr("cx", function (d) { return xScale(d[xColumn] )})
+			   .attr("cy", function (d) { return yScale(d[yColumn] )})
+			   .attr("r", function (d) { return rScale(d[rColumn] )})
+			   .style("fill", "white")
+
+		circles.exit().remove();
+	}
+
+	function type(d) {
+		d.longitude = +d.longitude;
+		d.latitude	= +d.latitude;
+		d.population = +d.population;
+		return d;
+	}
+
+	d3.csv("/csv/city-population-density.csv", type, render);
+</script>
