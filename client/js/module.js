@@ -29,5 +29,8 @@ dataModule.config(function ($routeProvider) {
 	.when("/world-cup-attendance", {
 		templateUrl: "/partials/world-cup-attendance.html"
 	})
+	.when("/world-countries", {
+		templateUrl: "/partials/world-countries.html"
+	})
 	.otherwise({ redirectTo: "/charts" })
 })

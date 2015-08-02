@@ -1,0 +1,40 @@
+<div class="row">
+	<div class="col-xs-8 col-xs-offset-2 col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
+		<h3 class="text-center">World Map</h3>
+		<br>
+		<section class="text-center"></section>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function draw(geoData) {
+		"use strict";
+		var margin = 50,
+			 width = 920 - margin,
+			height = 600 - margin;
+
+		var svg = d3.select("section")
+			.append("svg")
+			.attr("width", width + margin)
+			.attr("height", height + margin)
+			.append("g")
+			.attr("class", "map");
+
+		var projection = d3.geo.mercator()
+							   .scale(100)
+							   .translate([width/2, height/1.5]);
+
+		var path = d3.geo.path().projection(projection);
+
+		var map = svg.selectAll("path")
+			.data(geoData.features)
+			.enter()
+			.append("path")
+			.attr("d", path)
+			.style("fill", "lightblue")
+			.style("stroke", "black")
+			.style("stroke-width", 0.5);
+	}
+
+	d3.json("/json/world-countries.json", draw);
+</script>
