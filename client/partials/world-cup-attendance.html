@@ -1,0 +1,132 @@
+<div class="row">
+	<div class="col-xs-8 col-xs-offset-2 col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
+		<h3 class="text-center">World Cup Attendance</h3>
+		<br>
+		<section class="text-center"></section>
+	</div>
+</div>
+
+<style type="text/css">
+	circle {
+		opacity: 0.4;
+		stroke: none;
+	}
+</style>
+
+<script type="text/javascript">
+	function draw(data) {
+		"use strict";
+		var margin = 60,
+			 width = 750 - margin,
+			height = 500 - margin,
+			radius = 4;
+
+		var svg	= d3.select("section")
+			.append("svg")
+				.attr("width", width + margin)
+				.attr("height", height + margin)
+			.append("g")
+				.attr("class", "chart");
+
+		d3.select("svg")
+		  .selectAll("circle")
+		  .data(data)
+		  .enter()
+		  .append("circle")
+
+		var timeExtent = d3.extent(data, function (d) {
+			return d["date"];
+		});
+
+		var countExtent = d3.extent(data, function (d) {
+			return d["attendance"];
+		});
+
+		var timeScale = d3.time.scale()
+			.range([margin, width])
+			.domain(timeExtent);
+
+		var countScale = d3.scale.linear()
+			.range([height, margin])
+			.domain(countExtent);
+
+		var xAxis = d3.svg.axis()
+			.scale(timeScale)
+			.ticks(d3.time.years, 8);
+
+		var yAxis = d3.svg.axis()
+			.scale(countScale)
+			.orient("left");
+
+		d3.select("svg")
+		  .append("g")
+		  .attr("class", "x axis")
+		  .attr("transform", "translate(0," + height + ")")
+		  .call(xAxis);
+
+		d3.select("svg")
+		  .append("g")
+		  .attr("class", "y axis")
+		  .attr("transform", "translate(" + margin + ",0)")
+		  .call(yAxis);
+
+		d3.selectAll("circle")
+		  .attr("cx", function (d) {
+		  	return timeScale(d["date"])
+		  })
+		  .attr("cy", function (d) {
+		  	return countScale(d["attendance"])
+		  })
+		  .attr("r", radius)
+		  .style("fill", function (d) {
+		  	if (d["home"] === d["team1"] || d["home"] === d["team2"]) {
+		  		return "orange";
+		  	} else {
+		  		return "lightblue";
+		  	}
+		  });
+
+		var legend = svg.append("g")
+			.attr("class", "legend")
+			.attr("transform", "translate(" + (width-100) + "," + 80 + ")")
+			.selectAll("g")
+			.data(["Home Team", "Others"])
+			.enter().append("g");
+
+		legend.append("circle")
+			.attr("cy", function (d, i) {
+				return i * 30;
+			})
+			.attr("r", radius)
+			.style("fill", function (d) {
+				if (d == "Home Team") {
+			  		return "orange";
+			  	} else {
+			  		return "lightblue";
+			  	}
+			});
+
+		legend.append("text")
+			.attr("y", function (d, i) {
+				return i * 30 + 5;
+			})
+			.attr("x", radius * 5)
+			.text(function (d) {
+				return d;
+			})
+			.style("fill", function (d) {
+				if (d == "Home Team") {
+			  		return "orange";
+			  	} else {
+			  		return "lightblue";
+			  	}
+			})
+	};
+
+	format = d3.time.format("%d-%m-%Y (%H:%M h)");
+	d3.tsv("/tsv/world-cup-geo.tsv", function (d) {
+		d["date"] = format.parse(d["date"]);
+		d["attendance"] = +d["attendance"];
+		return d;
+	}, draw)
+</script>

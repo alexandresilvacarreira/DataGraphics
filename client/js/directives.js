@@ -33,9 +33,9 @@ dataModule.directive("isotopeContainer", function ($timeout) {
                 }, true);
 			// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-			$grid.imagesLoaded(function() {
-				$grid.isotope("layout");
-			})
+			// $grid.imagesLoaded(function() {
+			// 	$grid.isotope("layout");
+			// })
 
 			// angular.element(window.document).on("scroll", function() {
 			// 	$grid.isotope("shuffle");

@@ -23,8 +23,11 @@ dataModule.config(function ($routeProvider) {
 	.when("/simple-pie-chart", {
 		templateUrl: "/partials/simple-pie-chart.html"
 	})
-	.when("/donut-chart", {
-		templateUrl: "/partials/donut-chart.html"
+	.when("/stackoverflow-survey-popular-technologies", {
+		templateUrl: "/partials/stackoverflow-survey-popular-technologies.html"
+	})
+	.when("/world-cup-attendance", {
+		templateUrl: "/partials/world-cup-attendance.html"
 	})
 	.otherwise({ redirectTo: "/charts" })
 })
