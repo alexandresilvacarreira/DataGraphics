@@ -1,7 +1,7 @@
 # DataGraphics
 
 ### Description
-A data visualization project built on top of the D3.js library and the full MEAN Stack (MongoDB, ExpressJS, AngularJS, NodeJS).
+A personal data visualization project built on top of the D3.js library and the full MEAN Stack (MongoDB, ExpressJS, AngularJS, NodeJS).
 
 ### Data sets
 
