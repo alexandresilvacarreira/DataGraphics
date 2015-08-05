@@ -4,6 +4,15 @@
 	<section class="text-center"></section>
 </div>
 
+<style>
+	circle {
+		fill: orange;
+		stroke: black;
+		stroke-width: 0.7;
+		opacity: 0.7;
+	}
+</style>
+
 <script type="text/javascript">
 	function draw(geoData) {
 		"use strict";
@@ -34,41 +43,42 @@
 			.style("stroke-width", 0.5);
 
 		function plotPoints (data) {
+			function aggregateYear(leaves) {
+				var total = d3.sum(leaves, function (d) {
+									return d["attendance"];
+								});
+
+				var coords = leaves.map(function (d) {
+					return projection([+d.long, +d.lat]);
+				});
+
+				var centerX = d3.mean(coords, function (d) {
+					return d[0];
+				});
+
+				var centerY = d3.mean(coords, function (d) {
+					return d[1];
+				});
+
+				var teams = d3.set()
+
+				leaves.forEach(function (d) {
+					teams.add(d["team1"]);
+					teams.add(d["team2"]);
+				})
+
+				return {
+					"attendance": total,
+					"x": centerX,
+					"y": centerY,
+					"teams": teams.values()
+				}
+			}
 			var nested = d3.nest()
 						   .key(function (d) {
 								return d["date"].getUTCFullYear();
 						   })
-						   .rollup(function (leaves) {
-								var total = d3.sum(leaves, function (d) {
-									return d["attendance"];
-								});
-
-								var coords = leaves.map(function (d) {
-									return projection([+d.long, +d.lat]);
-								});
-
-								var centerX = d3.mean(coords, function (d) {
-									return d[0];
-								});
-
-								var centerY = d3.mean(coords, function (d) {
-									return d[1];
-								});
-
-								var teams = d3.set()
-
-								leaves.forEach(function (d) {
-									teams.add(d["team1"]);
-									teams.add(d["team2"]);
-								})
-
-								return {
-									"attendance": total,
-									"x": centerX,
-									"y": centerY,
-									"teams:": teams.values()
-								}
-						   })
+						   .rollup(aggregateYear)
 						   .entries(data);
 
 			var attendanceExtent = d3.extent(nested, function (d) {
@@ -84,16 +94,66 @@
 			   .selectAll("circle")
 			   .data(nested.sort(function (a, b) {
 					return b.values["attendance"] - a.values["attendance"];
-			   }))
+			   }), function (d) {
+			   		return d["key"];
+			   })
 			   .enter()
 			   .append("circle")
 			   .attr("cx", function (d) { return d.values["x"] })
 			   .attr("cy", function (d) { return d.values["y"] })
 			   .attr("r", function (d) { return radiusScale(d.values["attendance"]) })
-			   .attr("fill", "orange")
-			   .attr("stroke", "black")
-			   .attr("stroke-width", 0.7)
-			   .attr("opacity", 0.7);
+	
+			function update(year) {
+				var filtered = nested.filter(function (d) {
+					return new Date(d["key"]).getUTCFullYear() === year;
+				})
+
+				var circles = svg.selectAll("circle")
+								 .data(filtered, function (d) {
+								 	return d["key"];
+								 })
+
+				circles.exit().remove();
+
+				circles.enter()
+					   .append("circle")
+					   .attr("cx", function (d) { return d.values["x"] })
+					   .attr("cy", function (d) { return d.values["y"] })
+					   .attr("r", function (d) { return radiusScale(d.values["attendance"]) })
+				 
+
+				var countries = filtered[0].values["teams"];
+
+				function updateCountries(d) {
+					if (countries.indexOf(d.properties.name) !== -1) {
+						return "lightblue";
+					} else {
+						return "#272b30";
+					}
+				}
+
+				svg.selectAll("path")
+				   .style("fill", updateCountries)
+				   .style("stroke", updateCountries)
+			}
+
+			var years = [];
+
+			for (var i = 1930; i < 2015; i +=4) {
+				if (i !== 1942 && i !== 1946) {
+					years.push(i);
+				}
+			}
+
+			var yearIdx = 0;
+
+			var yearInterval = setInterval(function() {
+				update(years[yearIdx]);
+				yearIdx++;
+				if (yearIdx >= years.length) {
+					clearInterval(yearInterval);
+				}
+			}, 1000)
 		}
 
 		var format = d3.time.format("%d-%m-%Y (%H:%M h)");
