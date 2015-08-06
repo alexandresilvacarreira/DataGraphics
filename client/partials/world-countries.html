@@ -1,7 +1,10 @@
 <div class="row">
-	<h3 class="text-center">Countries that have hosted the World Cup</h3>
+	<h1 class="text-center">World Cups throughout the years</h1>
+	<h3 class="text-center"></h3>
 	<br>
-	<section class="text-center"></section>
+	<div class="world-cup text-center">
+		<section class="text-center"></section>
+	</div>
 </div>
 
 <style>
@@ -11,6 +14,19 @@
 		stroke-width: 0.7;
 		opacity: 0.7;
 	}
+
+	.years_button {
+		vertical-align: top;
+	}
+
+		.years_button div {
+			padding: 0.7em;
+			margin-bottom: 1em;
+			margin-right: 1em;
+			background-color: orange;
+			color: white;
+			display: inline-block;
+		}
 </style>
 
 <script type="text/javascript">
@@ -26,6 +42,14 @@
 			.attr("height", height + margin)
 			.append("g")
 			.attr("class", "map");
+
+		var years = [];
+
+		for (var i = 1930; i < 2015; i +=4) {
+			if (i !== 1942 && i !== 1946) {
+				years.push(i);
+			}
+		}
 
 		var projection = d3.geo.mercator()
 							   .scale(120)
@@ -108,6 +132,9 @@
 					return new Date(d["key"]).getUTCFullYear() === year;
 				})
 
+				d3.select("h3")
+				  .text("World Cup " + year);
+
 				var circles = svg.selectAll("circle")
 								 .data(filtered, function (d) {
 								 	return d["key"];
@@ -117,6 +144,8 @@
 
 				circles.enter()
 					   .append("circle")
+					   .transition()
+					   .duration(500)
 					   .attr("cx", function (d) { return d.values["x"] })
 					   .attr("cy", function (d) { return d.values["y"] })
 					   .attr("r", function (d) { return radiusScale(d.values["attendance"]) })
@@ -133,16 +162,10 @@
 				}
 
 				svg.selectAll("path")
+				   .transition()
+				   .duration(500)
 				   .style("fill", updateCountries)
-				   .style("stroke", updateCountries)
-			}
-
-			var years = [];
-
-			for (var i = 1930; i < 2015; i +=4) {
-				if (i !== 1942 && i !== 1946) {
-					years.push(i);
-				}
+				   .style("stroke", updateCountries);
 			}
 
 			var yearIdx = 0;
@@ -152,6 +175,34 @@
 				yearIdx++;
 				if (yearIdx >= years.length) {
 					clearInterval(yearInterval);
+
+					var buttons = d3.select("div .world-cup")
+						.append("div")
+						.attr("class", "years_button")
+						.selectAll("div")
+						.data(years)
+						.enter()
+						.append("div")
+						.text(function (d) {
+							return d;
+						});
+
+					buttons.on("click", function (d) {
+						d3.select(".years_button")
+						  .selectAll("div")
+						  .transition()
+						  .duration(500)
+						  .style("background", "orange")
+						  .style("color", "white");
+
+						d3.select(this)
+						  .transition()
+						  .duration(500)
+						  .style("background", "lightblue")
+						  .style("color", "white");
+
+						update(d);
+					})
 				}
 			}, 1000)
 		}
